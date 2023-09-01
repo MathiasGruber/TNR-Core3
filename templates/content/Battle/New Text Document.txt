@@ -1,0 +1,531 @@
+    //function to animate open and close on hover of select boxes
+    function SelectSlide( select )
+    {
+        if ( ( $( select ).attr( "size" ) ) == 1 && select[ select.selectedIndex ].value == 'default' )
+        {
+            var s = 1;
+            setInterval( function()
+            {
+                if ( s < select.length )
+                {
+                    s = s + 1;
+                    $( select ).attr( "size", s );
+                }
+            }, select.length + 2 );
+        }
+        else if ( ( $( select ).attr( "size" ) ) == select.length )
+        {
+            var s = select.length;
+            setInterval( function()
+            {
+                if ( s > 1 )
+                {
+                    s--;
+                    $( select ).attr( "size", s );
+                }
+            }, select.length );
+        }
+    }
+    //global var used for weapon_selects
+    var previous;
+
+    function ShowTarget()
+    {
+        var count = 0;
+        var filled = 0;
+        var selects = $( ".select-wrapper" ).not( $( '#select_target' ) );
+        for ( var i = 0; i < selects.length; i++ )
+        {
+            if ( $( selects[ i ] ).attr( 'id' ) != 'target_select' )
+            {
+                if ( $( selects[ i ] ).is( ':visible' ) )
+                {
+                    count++;
+                    if ( selects[ i ].value != 'default' )
+                    {
+                        filled++;
+                    }
+                }
+            }
+        }
+        if ( count == filled )
+        {
+            $( '#target_select' ).show();
+            var found_a_target = false;
+            $( '#target_select option' ).each( function()
+            {
+                var action_mode = $( '#action_select option:selected' ).text();
+                var targeting_mode = '';
+                if ( action_mode == 'Jutsus' )
+                {
+                    targeting_mode = $( '#jutsu_select option:selected' ).attr( 'class' );
+                }
+                else if ( action_mode == 'Weapons' )
+                {
+                    targeting_mode = $( '#weapon_attack_select option:selected' ).attr( 'class' );
+                }
+                else if ( action_mode == 'Items' )
+                {
+                    targeting_mode = $( '#item_attack_select option:selected' ).attr( 'class' );
+                }
+                else
+                {
+                    targeting_mode = '';
+                }
+                targeting_mode = targeting_mode.replace( ' row1', '' );
+                targeting_mode = targeting_mode.replace( ' row2', '' );
+                //self,opponent,ally,other,target,team,all,allOthers,rivalTeams
+                if ( targeting_mode == 'self' )
+                {
+                    var target_class = $( this ).attr( 'class' );
+                    target_class = target_class.replace( ' row1', '' );
+                    target_class = target_class.replace( ' row2', '' );
+                    if ( target_class == 'self' )
+                    {
+                        this.style.visibility = 'visible';
+                    }
+                    else if ( target_class == 'ally' )
+                    {
+                        this.style.visibility = 'hidden';
+                    }
+                    else if ( target_class == 'opponent' )
+                    {
+                        this.style.visibility = 'hidden';
+                    }
+                    else
+                    {
+                        this.style.visibility = 'visible';
+                    }
+                }
+                else if ( targeting_mode == 'opponent' )
+                {
+                    var target_class = $( this ).attr( 'class' );
+                    target_class = target_class.replace( ' row1', '' );
+                    target_class = target_class.replace( ' row2', '' );
+                    if ( target_class == 'self' )
+                    {
+                        this.style.visibility = 'hidden';
+                    }
+                    else if ( target_class == 'ally' )
+                    {
+                        this.style.visibility = 'hidden';
+                    }
+                    else if ( target_class == 'opponent' )
+                    {
+                        this.style.visibility = 'visible';
+                    }
+                    else
+                    {
+                        this.style.visibility = 'visible';
+                    }
+                }
+                else if ( targeting_mode == 'ally' )
+                {
+                    var target_class = $( this ).attr( 'class' );
+                    target_class = target_class.replace( ' row1', '' );
+                    target_class = target_class.replace( ' row2', '' );
+                    if ( target_class == 'self' )
+                    {
+                        this.style.visibility = 'hidden';
+                    }
+                    else if ( target_class == 'ally' )
+                    {
+                        this.style.visibility = 'visible';
+                    }
+                    else if ( target_class == 'opponent' )
+                    {
+                        this.style.visibility = 'hidden';
+                    }
+                    else
+                    {
+                        this.style.visibility = 'visible';
+                    }
+                }
+                else if ( targeting_mode == 'other' )
+                {
+                    var target_class = $( this ).attr( 'class' );
+                    target_class = target_class.replace( ' row1', '' );
+                    target_class = target_class.replace( ' row2', '' );
+                    if ( target_class == 'self' )
+                    {
+                        this.style.visibility = 'hidden';
+                    }
+                    else if ( target_class == 'ally' )
+                    {
+                        this.style.visibility = 'visible';
+                    }
+                    else if ( target_class == 'opponent' )
+                    {
+                        this.style.visibility = 'visible';
+                    }
+                    else
+                    {
+                        this.style.visibility = 'visible';
+                    }
+                }
+                else if ( targeting_mode == 'target' )
+                {
+                    this.style.visibility = 'visible';
+                }
+                else if ( targeting_mode == 'team' )
+                {
+                    this.style.visibility = 'visible';
+                }
+                else if ( targeting_mode == 'all' )
+                {
+                    this.style.visibility = 'visible';
+                }
+                else if ( targeting_mode == 'allOther' )
+                {
+                    this.style.visibility = 'visible';
+                }
+                else if ( targeting_mode == 'rivalTeams' )
+                {
+                    this.style.visibility = 'visible';
+                }
+                else //default if target is not set make all targets visible
+                {
+                    this.style.visibility = 'visible';
+                }
+                if ( this.style.visibility == 'visible' && found_a_target === false && this.value != 'default' )
+                {
+                    $( '#target_select' ).val( this.value ).prop( 'selected', true );
+                    found_a_target = true;
+                }
+            } );
+        }
+        else
+        {
+            $( '#target_select' ).hide();
+            $( '#button' ).hide();
+            $( '#target_select option[value=default]' ).prop( 'selected', true );
+        }
+        $( '#target_select' ).change();
+    }
+    //un hides the elements marked by previous
+    function showOldSelection()
+    {
+        var previous_elements = getElementsByClassName( previous );
+        for ( var i = 0; i < previous_elements.length; i++ )
+        {
+            previous_elements[ i ].style.visibility = 'visible';
+        }
+    }
+    //hides all members of a class
+    function hideOtherCopies( selectElement )
+    {
+        var x = $( '#' + selectElement.id + ' option:selected' ).attr( 'class' );
+        var elements = getElementsByClassName( x );
+        for ( var i = 0; i < elements.length; i++ )
+        {
+            elements[ i ].style.visibility = 'hidden';
+        }
+        $( ':focus' ).blur();
+    }
+    //gets element array by class name
+    function getElementsByClassName( className )
+    {
+        var matchingItems = [];
+        var allElements = document.getElementsByTagName( "*" );
+        for ( var i = 0; i < allElements.length; i++ )
+        {
+            if ( allElements[ i ].className == className )
+            {
+                matchingItems.push( allElements[ i ] );
+            }
+        }
+        return matchingItems;
+    }
+    
+    var timer = setInterval( function()
+    {
+        if ( $( '#turn_timer' ).text() > 0 )
+        {
+            $( '#turn_timer' ).text( $( '#turn_timer' ).text() - 1 );
+        }
+        else if ( $( '#turn_timer' ).text() == 0 )
+        {
+            //$('#refresh_button').click();
+            $( '#combat_page' ).load( document.URL + ' #combat_page' );
+            //readyPage();
+        }
+        else
+        {
+            $( '#turn_timer' ).text( '0' );
+        }
+    }, 1000 );
+    
+    
+          
+    var check_for_end_of_turn = setInterval( function()
+    {
+        $.get( window.location.protocol + "//" + window.location.host + "/" + "clean_room/combat_backend/?what_to_get=turn_counter&id=" + the_id, function( data, status )
+        {
+            if ( parseInt( data ) + 1 > $( '.turn_counter' ).text() )
+            {
+                //$('#refresh_button').click();
+                $( '#combat_page' ).load( document.URL + ' #combat_page' );
+                //readyPage();
+            }
+        } );
+    }, 3000 );
+    
+    
+    setTimeout( function()
+    {
+        $( document ).ready( function()
+        {
+            $( document ).keypress( function( e )
+            {
+                if ( e.which == 13 )
+                {
+                    if ( $( '#button' ).is( ':visible' ) )
+                    {
+                        $( '#button' ).click();
+                        $( '#button' ).prop( 'disabled', true );
+                        setTimeout( function()
+                        {
+                            $( '#button' ).prop( 'disabled', false );
+                        }, 3000 );
+                    }
+                }
+            } );
+        }, 1000 );
+    } );
+
+    function readyPage()
+    {
+        console.log('start');
+        //seting pools on side bar.
+        var health = $( '#ownerHealthBar' ).data( 'healthtxt' ).split( '/' );
+        health = ( health[ 0 ] / health[ 1 ] ) * 100;
+        var chakra = $( '#ownerChakraBar' ).data( 'chakratxt' ).split( '/' );
+        chakra = ( chakra[ 0 ] / chakra[ 1 ] ) * 100;
+        var stamina = $( '#ownerStaminaBar' ).data( 'staminatxt' ).split( '/' );
+        stamina = ( stamina[ 0 ] / stamina[ 1 ] ) * 100;
+        $( '#heaBar' ).css( 'width', parseInt( health ) + 'px' );
+        $( '#chaBar' ).css( 'width', parseInt( chakra ) + 'px' );
+        $( '#staBar' ).css( 'width', parseInt( stamina ) + 'px' );
+        $( '#healthTxtBar' ).text( $( '#ownerHealthBar' ).data( 'healthtxt' ) );
+        $( '#chakraTxtBar' ).text( $( '#ownerChakraBar' ).data( 'chakratxt' ) );
+        $( '#staminaTxtBar' ).text( $( '#ownerStaminaBar' ).data( 'staminatxt' ) );
+        //hiding all things be default except action_select
+        $( '#weapon_attack_select' ).hide();
+        $( 'select[name^="jutsu_weapon_select-' ).hide();
+        $( '#item_attack_select' ).hide();
+        $( '#action_select' ).prop( 'selectedIndex', 1 );
+        $( '#jutsu_select' ).prop( 'selectedIndex', $( '#jutsu_select option' ).length - 1 );
+        $( '[class^="round"]' ).hide();
+        $( '[class^="details_round"]' ).hide();
+        $( '[class^="round' + ( $( '.turn_counter' ).text() - 1 ) + '"]' ).show();
+        $( '[class^="details_round' + ( $( '.turn_counter' ).text() - 1 ) + '_' + ( $( '.owner' ).attr( 'value' ) ) + '"]' ).show();
+        var index = 0;
+        var set_index = false;
+        $( '#target_select option' ).each( function()
+        {
+            if ( this.className == 'opponent' )
+            {
+                this.style.visibility = 'visible';
+                if ( set_index === false )
+                {
+                    set_index = true;
+                    $( '#target_select' ).prop( 'selectedIndex', index );
+                }
+            }
+            else
+            {
+                this.style.visibility = 'hidden';
+            }
+            index++;
+        } );
+        $( '#button' ).text( 'GO!' );
+        //$('#button').val('doJutsu|' + link_code);
+        $( '#button' ).click( function()
+        {
+            $( '#button' ).val( 'doJutsu|' + link_code );
+        } );
+        $( '#button' ).prop( 'disabled', true );
+        setTimeout( function()
+        {
+            $( '#button' ).prop( 'disabled', false );
+        }, 750 );
+        $( 'select[name^="jutsu_weapon_select"]' ).each( function()
+        {
+            if ( this.length == 1 )
+            {
+                this.disabled = true;
+            }
+        } );
+        //setting animation to occur on hover
+        $( ".select-wrapper" ).hover( function()
+        {
+            SelectSlide( this );
+        } );
+        //closing selects automaticly on change
+        $( ".select-wrapper" ).change( function()
+        {
+            SelectSlide( this );
+        } );
+        //on change of action select
+        $( '#action_select' ).change( function()
+        {
+            selected_value = this[ this.selectedIndex ].text;
+            $( '.select-wrapper' ).not( this ).hide();
+            var temp_index = this.selectedIndex;
+            $( '.select-wrapper option[value=default]' ).prop( 'selected', true );
+            this.selectedIndex = temp_index;
+            if ( selected_value == 'Jutsus' )
+            {
+                $( '#jutsu_select' ).show();
+            }
+            else
+            {
+                $( '#jutsu_select' ).hide();
+            }
+            if ( selected_value == 'Weapons' )
+            {
+                $( '#weapon_attack_select' ).show();
+            }
+            else
+            {
+                $( '#weapon_attack_select' ).hide();
+            }
+            if ( selected_value == 'Items' )
+            {
+                $( '#item_attack_select' ).show();
+            }
+            else
+            {
+                $( '#item_attack_select' ).hide();
+            }
+            ShowTarget();
+        } );
+        $( '#jutsu_select' ).change( function()
+        {
+            $( '#target_select option[value=default]' ).prop( 'selected', true );
+            $( 'select[name^="jutsu_weapon_select-"] option' ).css( "visibility", "visible" );
+            $( 'select[name^="jutsu_weapon_select-"]' ).hide();
+            $( 'select[name^="jutsu_weapon_select-' + this.value + '"]' ).show();
+            var collection = $( 'select[name^="jutsu_weapon_select-"]' );
+            for ( var i = 0; i < collection.length; i++ )
+            {
+                collection[ i ].options.selectedIndex = 0;
+            }
+            ShowTarget();
+        } );
+        $( 'select[name^="jutsu_weapon_select-' ).focus( function()
+        {
+            //handle previous
+            previous = $( '#' + this.id + ' option:selected' ).attr( 'class' );
+        } ).change( function()
+        {
+            //handle current
+            showOldSelection();
+            hideOtherCopies( this );
+            ShowTarget();
+        } );
+        $( '#weapon_attack_select' ).change( function()
+        {
+            ShowTarget();
+        } );
+        $( '#item_attack_select' ).change( function()
+        {
+            ShowTarget();
+        } );
+        $( '#target_select' ).change( function()
+        {
+            if ( $( '#target_select option:selected' ).val() != 'default' )
+            {
+                $( '#button' ).show();
+                var action_type = $( '#action_select option:selected' ).text();
+                if ( action_type == 'Jutsus' )
+                {
+                    $( '#button' ).unbind( 'click' );
+                    $( '#button' ).click( function()
+                    {
+                        $( '#button' ).val( 'doJutsu|' + link_code );
+                    } );
+                    $( '#button' ).text( 'GO!' );
+                }
+                else if ( action_type == 'Weapons' )
+                {
+                    $( '#button' ).unbind( 'click' );
+                    $( '#button' ).click( function()
+                    {
+                        $( '#button' ).val( 'useWeapon|' + link_code );
+                    } );
+                    $( '#button' ).text( 'GO!' );
+                }
+                else if ( action_type == 'Items' )
+                {
+                    $( '#button' ).unbind( 'click' );
+                    $( '#button' ).click( function()
+                    {
+                        $( '#button' ).val( 'useItem|' + link_code );
+                    } );
+                    $( '#button' ).text( 'GO!' );
+                }
+                else if ( action_type == 'Flee' )
+                {
+                    $( '#button' ).unbind( 'click' );
+                    $( '#button' ).click( function()
+                    {
+                        $( '#button' ).val( 'tryFlee|' + link_code );
+                    } );
+                    $( '#button' ).text( 'GO!' );
+                }
+                else if ( action_type == 'Call For Help' )
+                {
+                    $( '#button' ).unbind( 'click' );
+                    $( '#button' ).click( function()
+                    {
+                        $( '#button' ).val( 'call_for_help|' + link_code );
+                    } );
+                    $( '#button' ).text( 'GO!' );
+                }
+                else
+                {
+                    $( '#button' ).val( 'error' );
+                    $( '#button' ).text( 'error' );
+                }
+            }
+            else
+            {
+                $( '#button' ).hide();
+                $( '#button' ).val( '' );
+                $( '#button' ).text( '' );
+            }
+        } );
+        //setting every other row stuffs
+        $( '.select-wrapper' ).each( function()
+        {
+            var flag = 1;
+            $( '#' + this.id + ' option' ).each( function()
+            {
+                $( this ).addClass( 'row' + flag );
+                if ( flag == 1 )
+                {
+                    flag = 2;
+                }
+                else
+                {
+                    flag = 1;
+                }
+            } );
+        } );
+        $( '[class^="header_round"]' ).click( function()
+        {
+            $( '[class^="' + 'round' + $( this ).text().match( /\d+/ ) + '_"]' ).toggle();
+        } );
+        $( '[class^="round"]' ).click( function()
+        {
+            if ( $( this ).attr( 'class' ).length > 8 )
+            {
+                $( ( '.details_' + $( this ).attr( 'class' ) ).replace( /\s+/g, '.' ) ).toggle();
+            }
+        } );
+        
+        console.log('end');
+    }
+    
+    $( document ).ready( readyPage );

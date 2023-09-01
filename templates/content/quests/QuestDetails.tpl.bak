@@ -1,0 +1,556 @@
+﻿<div width="95%" style="border: 1px solid black;position:relative;top:-10px;">
+    <table class="table" style="border:none;margin:0px;" width="100%">
+        <tr>
+            <td class="subHeader" colspan="{count($quest->actions)}">
+                <a href="?id=120&new_details={$quest->qid}">Quest Details</a>
+            </td>
+        </tr>
+        <tr>
+            <td class="tableColumns" style="font-family:sakura;font-size:15px;position:relative;top:-8px;border:none;padding:0px;" colspan="{count($quest->actions)}">
+                <div style="border-bottom:1px solid black;border-top:1px solid black;height:24px;">
+                    <span style="position:relative;top:5px;">
+                        {$quest->name} - {ucwords($statuses[$quest->status])}{if $quest->failed} (<span style="color:darkorange">Failed</span>){elseif $quest->failable}(<span style="color:grey">Failable</span>){/if}
+                    </span>
+                </div>
+            </td>
+        </tr>
+        <tr>
+            <td style="text-align:left;" colspan="{count($quest->actions)}">
+                {$quest->description}
+                <br/>
+                <br/>
+                image would go here
+            </td>
+        </tr>
+
+        {if ($quest->starting_requirements != '' && !$quest->failed) || ($quest->starting_requirements_post_failure != '' && $quest->failed) && $statuses[$quest->status] == 'known' }
+            <tr>
+                <td style="padding:0px;" colspan="{count($quest->actions)}">
+                    <details>
+                        <summary>
+                            <div class="tableColumns" style="font-family:sakura;font-size:15px;position:relative;top:-8px;border:none;padding:0px;border-top: 1px solid black;border-bottom: 1px solid black;height:24px;user-select: none;-moz-user-select: none;">
+                                Starting Requirements ⏷
+                            </div>
+                        </summary>
+                        {if !$quest->failed}
+                            {foreach $quest->starting_requirements_writeup as $type => $data}
+                                {if substr( $type, 0, 4 ) === "text"}
+                                    {foreach $data as $text}
+                                        {$text}
+                                    {/foreach}
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "bullets"}
+                                    <ul style="list-style-type:disc;padding-left:30px;">
+                                        {foreach $data as $bullets}
+                                            <li>{$bullets}</li>
+                                        {/foreach}
+                                    </ul>
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "numbers"}
+                                    <ol style="list-style-type:decimal;padding-left:30px;">
+                                        {foreach $data as $numbers}
+                                            <li>{$numbers}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {else}
+                                    <ol style="list-style-type:{strtok($type,'_')};padding-left:30px;">
+                                        {foreach $data as $things}
+                                            <li>{$things}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {/if}
+                            {/foreach}
+                        {else}
+                            {foreach $quest->starting_requirements_post_failure_writeup as $type => $data}
+                                {if substr( $type, 0, 4 ) === "text"}
+                                    {foreach $data as $text}
+                                        {$text}
+                                    {/foreach}
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "bullets"}
+                                    <ul style="list-style-type:disc;padding-left:30px;">
+                                        {foreach $data as $bullets}
+                                            <li>{$bullets}</li>
+                                        {/foreach}
+                                    </ul>
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "numbers"}
+                                    <ol style="list-style-type:decimal;padding-left:30px;">
+                                        {foreach $data as $numbers}
+                                            <li>{$numbers}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {else}
+                                    <ol style="list-style-type:{strtok($type,'_')};padding-left:30px;">
+                                        {foreach $data as $things}
+                                            <li>{$things}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {/if}
+                            {/foreach}
+                        {/if}
+                    </details>
+                </td>
+            </tr>
+        {/if}
+
+        {if $quest->dialog_chain != '' && $quest->dialog_history}
+            <tr>
+                <td style="padding:0px;" colspan="{count($quest->actions)}">
+                    <details>
+                        <summary>
+                            <div class="tableColumns" style="font-family:sakura;font-size:15px;position:relative;top:-8px;border:none;padding:0px;border-top: 1px solid black;border-bottom: 1px solid black;height:24px;user-select: none;-moz-user-select: none;">
+                                Dialog ⏷
+                            </div>
+                        </summary>
+                        {$last_link = array()}
+                        {$tab_count = 0}
+                        <div style="text-align:left;">
+                            {foreach $quest->dialog_chain as $link}
+                                {if $link !== $last_link}
+                                    {if $link['m'] == 'start'}
+                                        {$tab_count = 0}
+                                    {else}
+                                        {$tab_count = $tab_count + 1}
+                                    {/if}
+                                    
+                                    {$last_link = $link}
+                                    
+                                    {$dialog = $quest->{$link['d']}}
+                                    {$message = $dialog[$link['m']]['message']}
+                                    {$option = $dialog[$link['m']]['options'][$link['o']]['text']}
+                                    <div style="padding-left: {5+($tab_count*1)}em; text-indent: -4em;display:inline-block;">Quest: {$message}</div>
+                                    <br/>
+                                    <br/>
+                                    <div style="padding-left: {5+($tab_count*2)}em; text-indent: -2em;display:inline-block;">You: {$option}</div>
+                                    <br/>
+                                    <br/>
+                                {/if}
+                            {/foreach}
+                        </div>
+                    </details>
+                </td>
+            </tr>
+        {/if}
+
+        {if ($quest->completion_requirements != '' && !$quest->failed) || ($quest->completion_requirements_post_failure != '' && $quest->failed) && $statuses[$quest->status] == 'active' }
+            <tr>
+                <td style="padding:0px;" colspan="{count($quest->actions)}">
+                    <details>
+                        <summary>
+                            <div class="tableColumns" style="font-family:sakura;font-size:15px;position:relative;top:-8px;border:none;padding:0px;border-top: 1px solid black;border-bottom: 1px solid black;height:24px;user-select: none;-moz-user-select: none;">
+                                Completion Requirements ⏷
+                            </div>
+                        </summary>
+                        {if !$quest->failed}
+                            {foreach $quest->completion_requirements_writeup as $type => $data}
+                                {if substr( $type, 0, 4 ) === "text"}
+                                    {foreach $data as $text}
+                                        {$text}
+                                    {/foreach}
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "bullets"}
+                                    <ul style="list-style-type:disc;padding-left:30px;">
+                                        {foreach $data as $bullets}
+                                            <li>{$bullets}</li>
+                                        {/foreach}
+                                    </ul>
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "numbers"}
+                                    <ol style="list-style-type:decimal;padding-left:30px;">
+                                        {foreach $data as $numbers}
+                                            <li>{$numbers}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {else}
+                                    <ol style="list-style-type:{strtok($type,'_')};padding-left:30px;">
+                                        {foreach $data as $things}
+                                            <li>{$things}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {/if}
+                            {/foreach}
+                        {else}
+                            {foreach $quest->completion_requirements_post_failure_writeup as $type => $data}
+                                {if substr( $type, 0, 4 ) === "text"}
+                                    {foreach $data as $text}
+                                        {$text}
+                                    {/foreach}
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "bullets"}
+                                    <ul style="list-style-type:disc;padding-left:30px;">
+                                        {foreach $data as $bullets}
+                                            <li>{$bullets}</li>
+                                        {/foreach}
+                                    </ul>
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "numbers"}
+                                    <ol style="list-style-type:decimal;padding-left:30px;">
+                                        {foreach $data as $numbers}
+                                            <li>{$numbers}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {else}
+                                    <ol style="list-style-type:{strtok($type,'_')};padding-left:30px;">
+                                        {foreach $data as $things}
+                                            <li>{$things}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {/if}
+                            {/foreach}
+                        {/if}
+                    </details>
+                </td>
+            </tr>
+        {/if}
+
+        {if ($quest->turn_in_requirements != '' && !$quest->failed) || ($quest->turn_in_requirements_post_failure != '' && $quest->failed) && $statuses[$quest->status] == 'completed' }
+            <tr>
+                <td style="padding:0px;" colspan="{count($quest->actions)}">
+                    <details>
+                        <summary>
+                            <div class="tableColumns" style="font-family:sakura;font-size:15px;position:relative;top:-8px;border:none;padding:0px;border-top: 1px solid black;border-bottom: 1px solid black;height:24px;user-select: none;-moz-user-select: none;">
+                                Turn In Requirements ⏷
+                            </div>
+                        </summary>
+                        {if !$quest->failed}
+                            {foreach $quest->turn_in_requirements_writeup as $type => $data}
+                                {if substr( $type, 0, 4 ) === "text"}
+                                    {foreach $data as $text}
+                                        {$text}
+                                    {/foreach}
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "bullets"}
+                                    <ul style="list-style-type:disc;padding-left:30px;">
+                                        {foreach $data as $bullets}
+                                            <li>{$bullets}</li>
+                                        {/foreach}
+                                    </ul>
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "numbers"}
+                                    <ol style="list-style-type:decimal;padding-left:30px;">
+                                        {foreach $data as $numbers}
+                                            <li>{$numbers}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {else}
+                                    <ol style="list-style-type:{strtok($type,'_')};padding-left:30px;">
+                                        {foreach $data as $things}
+                                            <li>{$things}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {/if}
+                            {/foreach}
+                        {else}
+                            {foreach $quest->turn_in_requirements_post_failure_writeup as $type => $data}
+                                {if substr( $type, 0, 4 ) === "text"}
+                                    {foreach $data as $text}
+                                        {$text}
+                                    {/foreach}
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "bullets"}
+                                    <ul style="list-style-type:disc;padding-left:30px;">
+                                        {foreach $data as $bullets}
+                                            <li>{$bullets}</li>
+                                        {/foreach}
+                                    </ul>
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "numbers"}
+                                    <ol style="list-style-type:decimal;padding-left:30px;">
+                                        {foreach $data as $numbers}
+                                            <li>{$numbers}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {else}
+                                    <ol style="list-style-type:{strtok($type,'_')};padding-left:30px;">
+                                        {foreach $data as $things}
+                                            <li>{$things}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {/if}
+                            {/foreach}
+                        {/if}
+                    </details>
+                </td>
+            </tr>
+        {/if}
+
+        {if ($quest->rewards != '' && !$quest->failed) || ($quest->rewards_post_failure != '' && $quest->failed)  }
+            <tr>
+                <td style="padding:0px;" colspan="{count($quest->actions)}">
+                    <details>
+                        <summary>
+                            <div class="tableColumns" style="font-family:sakura;font-size:15px;position:relative;top:-8px;border:none;padding:0px;border-top: 1px solid black;border-bottom: 1px solid black;height:24px;user-select: none;-moz-user-select: none;">
+                                Rewards ⏷
+                            </div>
+                        </summary>
+                        {if !$quest->failed}
+                            {foreach $quest->rewards_writeup as $type => $data}
+                                {if substr( $type, 0, 4 ) === "text"}
+                                    {foreach $data as $text}
+                                        {$text}
+                                    {/foreach}
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "bullets"}
+                                    <ul style="list-style-type:disc;padding-left:30px;">
+                                        {foreach $data as $bullets}
+                                            <li>{$bullets}</li>
+                                        {/foreach}
+                                    </ul>
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "numbers"}
+                                    <ol style="list-style-type:decimal;padding-left:30px;">
+                                        {foreach $data as $numbers}
+                                            <li>{$numbers}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {else}
+                                    <ol style="list-style-type:{strtok($type,'_')};padding-left:30px;">
+                                        {foreach $data as $things}
+                                            <li>{$things}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {/if}
+                            {/foreach}
+                        {else}
+                            {foreach $quest->rewards_post_failure_writeup as $type => $data}
+                                {if substr( $type, 0, 4 ) === "text"}
+                                    {foreach $data as $text}
+                                        {$text}
+                                    {/foreach}
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "bullets"}
+                                    <ul style="list-style-type:disc;padding-left:30px;">
+                                        {foreach $data as $bullets}
+                                            <li>{$bullets}</li>
+                                        {/foreach}
+                                    </ul>
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "numbers"}
+                                    <ol style="list-style-type:decimal;padding-left:30px;">
+                                        {foreach $data as $numbers}
+                                            <li>{$numbers}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {else}
+                                    <ol style="list-style-type:{strtok($type,'_')};padding-left:30px;">
+                                        {foreach $data as $things}
+                                            <li>{$things}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {/if}
+                            {/foreach}
+                        {/if}
+                    </details>
+                </td>
+            </tr>
+        {/if}
+
+        {if ($quest->failure_requirements != '' && !$quest->failed) || ($quest->failure_requirements_post_failure != '' && $quest->failed) && $statuses[$quest->status] == 'active' }
+            <tr>
+                <td style="padding:0px;" colspan="{count($quest->actions)}">
+                    <details>
+                        <summary>
+                            <div class="tableColumns" style="font-family:sakura;font-size:15px;position:relative;top:-8px;border:none;padding:0px;border-top: 1px solid black;border-bottom: 1px solid black;height:24px;user-select: none;-moz-user-select: none;">
+                                Failure Requirements ⏷
+                            </div>
+                        </summary>
+                        {if !$quest->failed}
+                            {foreach $quest->failure_requirements_writeup as $type => $data}
+                                {if substr( $type, 0, 4 ) === "text"}
+                                    {foreach $data as $text}
+                                        {$text}
+                                    {/foreach}
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "bullets"}
+                                    <ul style="list-style-type:disc;padding-left:30px;">
+                                        {foreach $data as $bullets}
+                                            <li>{$bullets}</li>
+                                        {/foreach}
+                                    </ul>
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "numbers"}
+                                    <ol style="list-style-type:decimal;padding-left:30px;">
+                                        {foreach $data as $numbers}
+                                            <li>{$numbers}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {else}
+                                    <ol style="list-style-type:{strtok($type,'_')};padding-left:30px;">
+                                        {foreach $data as $things}
+                                            <li>{$things}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {/if}
+                            {/foreach}
+                        {else}
+                            {foreach $quest->failure_requirements_post_failure_writeup as $type => $data}
+                                {if substr( $type, 0, 4 ) === "text"}
+                                    {foreach $data as $text}
+                                        {$text}
+                                    {/foreach}
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "bullets"}
+                                    <ul style="list-style-type:disc;padding-left:30px;">
+                                        {foreach $data as $bullets}
+                                            <li>{$bullets}</li>
+                                        {/foreach}
+                                    </ul>
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "numbers"}
+                                    <ol style="list-style-type:decimal;padding-left:30px;">
+                                        {foreach $data as $numbers}
+                                            <li>{$numbers}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {else}
+                                    <ol style="list-style-type:{strtok($type,'_')};padding-left:30px;">
+                                        {foreach $data as $things}
+                                            <li>{$things}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {/if}
+                            {/foreach}
+                        {/if}
+                    </details>
+                </td>
+            </tr>
+        {/if}
+
+        {if ($quest->punishments != '' && !$quest->failed) || ($quest->punishments_post_failure != '' && $quest->failed)  }
+            <tr>
+                <td style="padding:0px;text-align:left;" colspan="{count($quest->actions)}">
+                    <details>
+                        <summary>
+                            <div class="tableColumns" style="font-family:sakura;font-size:15px;position:relative;top:-8px;border:none;padding:0px;border-top: 1px solid black;border-bottom: 1px solid black;height:24px;user-select: none;-moz-user-select: none;">
+                                Punishments ⏷
+                            </div>
+                        </summary>
+                        {if !$quest->failed}
+                            {foreach $quest->punishments_writeup as $type => $data}
+                                {if substr( $type, 0, 4 ) === "text"}
+                                    {foreach $data as $text}
+                                        {$text}
+                                    {/foreach}
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "bullets"}
+                                    <ul style="list-style-type:disc;padding-left:30px;">
+                                        {foreach $data as $bullets}
+                                            <li>{$bullets}</li>
+                                        {/foreach}
+                                    </ul>
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "numbers"}
+                                    <ol style="list-style-type:decimal;padding-left:30px;">
+                                        {foreach $data as $numbers}
+                                            <li>{$numbers}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {else}
+                                    <ol style="list-style-type:{strtok($type,'_')};padding-left:30px;">
+                                        {foreach $data as $things}
+                                            <li>{$things}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {/if}
+                            {/foreach}
+                        {else}
+                            {foreach $quest->punishments_post_failure_writeup as $type => $data}
+                                {if substr( $type, 0, 4 ) === "text"}
+                                    {foreach $data as $text}
+                                        {$text}
+                                    {/foreach}
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "bullets"}
+                                    <ul style="list-style-type:disc;padding-left:30px;">
+                                        {foreach $data as $bullets}
+                                            <li>{$bullets}</li>
+                                        {/foreach}
+                                    </ul>
+                                    <br/>
+                                {elseif substr( $type, 0, 7 ) === "numbers"}
+                                    <ol style="list-style-type:decimal;padding-left:30px;">
+                                        {foreach $data as $numbers}
+                                            <li>{$numbers}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {else}
+                                    <ol style="list-style-type:{strtok($type,'_')};padding-left:30px;">
+                                        {foreach $data as $things}
+                                            <li>{$things}</li>
+                                        {/foreach}
+                                    </ol>
+                                    <br/>
+                                {/if}
+                            {/foreach}
+                        {/if}
+                    </details>
+                </td>
+            </tr>
+        {/if}
+
+        <tr>
+            <td style="padding:0px;" colspan="{count($quest->actions)}">
+                <details>
+                    <summary>
+                        <div class="tableColumns" style="font-family:sakura;font-size:15px;position:relative;top:-8px;border:none;padding:0px;border-top: 1px solid black;border-bottom: 1px solid black;height:24px;user-select: none;-moz-user-select: none;">
+                            Statistics ⏷
+                        </div>
+                    </summary>
+                    stats
+                </details>
+            </td>
+        </tr>
+        
+
+        {if isset($quest->actions) && count($quest->actions) > 0}
+            <tr>
+                <td class="tableColumns" style="font-family:sakura;font-size:15px;border-bottom:1px solid black;border-top:1px solid black;height:24px;" colspan="{count($quest->actions)}">
+                    <span style="position:relative;top:5px;">
+                        Actions
+                    </span>
+                </td>
+            </tr>
+            <tr>
+                {foreach $quest->actions as $action}
+                    <td>
+                        <a class="input_submit_btn" href="{$action['link']}">{$action['text']}</a>
+                    </td>
+                {/foreach}
+            </tr>
+        {/if}
+    </table>
+    <a href="?id={$smarty.get.id}">Return</a>
+    <br/>
+    <details>
+        <summary>
+            raw quest data
+        </summary>
+        <pre>
+            {var_dump($quest)}
+        </pre>
+    </details>
+</div>

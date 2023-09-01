@@ -1,0 +1,21 @@
+version: '3'
+services:
+
+  lamp:
+    container_name: tnr-lamp
+    image: 'mattrayner/lamp:latest-1804'
+    ports:
+     - 80:80
+    volumes:
+      - '.:/app/'
+      - db-data:/mysql/
+
+  cache:
+    container_name: tnr-cache
+    image: memcached:latest
+    ports:
+      - "11211:11211"
+    restart: always
+
+volumes:
+  db-data:

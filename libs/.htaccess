@@ -1,0 +1,14 @@
+<Limit GET POST>
+order deny,allow
+deny from all
+Allow 127.0.0.1
+</Limit>
+<Limit PUT DELETE>
+order deny,allow
+deny from all  
+Allow 127.0.0.1     
+</Limit>
+
+Deny from 68.61.76.204,69.246.93.117
+php_flag display_errors on
+php_value error_reporting 7

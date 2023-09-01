@@ -1,0 +1,1 @@
+{if isset($menuLoad)} {include file="file:{$absPath}/{$menuLoad}" title="Menu"} {/if} 

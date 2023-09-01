@@ -1,0 +1,9 @@
+User-agent: *
+Disallow: 
+Disallow: /global_libs/
+Disallow: /admin/
+Disallow: /content/
+Disallow: /templates/
+Disallow: /templates_c/
+Disallow: /logs/
+Sitemap: http://www.theninja-development.com/sitemap.xml
